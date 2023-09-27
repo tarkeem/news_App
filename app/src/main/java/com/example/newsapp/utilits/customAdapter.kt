@@ -35,23 +35,6 @@ class myCustomAdapter(var cxt:Context) : RecyclerView.Adapter<myCustomAdapter.Vi
         return ViewHolder(view)
     }
 
-    // binds the list items to a view
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-
-        val mynews = differ.currentList[position]
-
-        // sets the image to the imageview from our itemHolder class
-       holder.title.text=mynews.title
-        holder.description.text=mynews.description
-        Glide.with(cxt).load(mynews.urlToImage).into(holder.image)
-
-
-    }
-
-    // return the number of the items in the list
-    override fun getItemCount(): Int {
-        return differ.currentList.size
-    }
 
     // Holds the views for adding it to image and text
     class ViewHolder(ItemView: View) : RecyclerView.ViewHolder(ItemView),View.OnClickListener {
@@ -64,4 +47,42 @@ class myCustomAdapter(var cxt:Context) : RecyclerView.Adapter<myCustomAdapter.Vi
 
 
     }
+
+
+
+    // return the number of the items in the list
+    override fun getItemCount(): Int {
+        return differ.currentList.size
+    }
+
+
+    // binds the list items to a view
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+
+        val mynews = differ.currentList[position]
+
+        // sets the image to the imageview from our itemHolder class
+       holder.title.text=mynews.title
+        holder.description.text=mynews.description
+        Glide.with(cxt).load(mynews.urlToImage).into(holder.image)
+
+       holder.itemView.apply {
+           setOnClickListener {
+               oncItemClick?.let {
+
+
+                   it(mynews)
+               }
+           }
+       }
+
+
+    }
+   //make to to controll the click event in the main page
+    private var oncItemClick : ((Article) -> Unit)?=null
+    fun setOnItemClickListener(listener : (Article) -> Unit){
+oncItemClick=listener
+    }
+
+
 }

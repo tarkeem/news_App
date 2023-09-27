@@ -1,19 +1,30 @@
 package com.example.newsapp.viewmodels
 
+import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.room.Room
+import com.example.newsapp.db.newsDao
+
+
+import com.example.newsapp.model.Article
 import com.example.newsapp.model.news
 import com.example.newsapp.repo.newsRepo
 import com.example.newsapp.repo.newsRepoImpl
 import kotlinx.coroutines.launch
 import retrofit2.Response
 
-class newsViewModel:ViewModel(){
-    var newsRepoImpl: newsRepoImpl=newsRepoImpl()
+class newsViewModel(var cxt:Context):ViewModel(){
 
-    //tag:
+
+    var newsRepoImpl: newsRepoImpl=newsRepoImpl(cxt)
+
+    //region: api_part
     var newsData:MutableLiveData<newsState> = MutableLiveData()
+
+
+
     fun  getNews()
     {
         viewModelScope.launch {
@@ -58,12 +69,28 @@ class newsViewModel:ViewModel(){
     data class searchState(var isLoading:Boolean=false,var data:Response<news>)
 
 
+//endregion
+
+//region::data base part
+    fun inserToDb(article: Article)
+    {
+        viewModelScope.launch {
+            newsRepoImpl.insertTodb(article)
+        }
+
+    }
+    var savedNews:MutableLiveData<List<Article>> = MutableLiveData()
+
+    fun getNewsFromDb()
+    {
+        viewModelScope.launch {
+          savedNews.postValue(newsRepoImpl.getFromDb().value)
+        }
+
+    }
 
 
-
-
-
-
+    //endregion
 
 
 

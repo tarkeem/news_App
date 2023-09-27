@@ -8,6 +8,8 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.newsapp.databinding.FragmentDashboardBinding
+import com.example.newsapp.viewmodels.newsViewModel
+import com.example.newsapp.viewmodels.newsViewModelFactory
 
 class FavouriteFragment : Fragment() {
 
@@ -22,16 +24,32 @@ class FavouriteFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val dashboardViewModel =
-            ViewModelProvider(this).get(FavouriteViewModel::class.java)
+        val viewModelfactory= newsViewModelFactory(this.context!!)
+        var viewModel: newsViewModel = ViewModelProvider(this,viewModelfactory).get(newsViewModel::class.java)
 
         _binding = FragmentDashboardBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
         val textView: TextView = binding.textDashboard
-        dashboardViewModel.text.observe(viewLifecycleOwner) {
-            textView.text = it
+
+
+
+
+        viewModel.getNewsFromDb()
+        viewModel.savedNews.observe(this) {
+            if (it!=null)
+            {
+                println("saved news........................")
+                println(it.toString())
+            }
+
         }
+
+
+
+
+
+
         return root
     }
 

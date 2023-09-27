@@ -1,24 +1,18 @@
 package com.example.newsapp.fragments.home
 
 import android.os.Bundle
-import android.system.ErrnoException
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.newsapp.api.newsapi
-import com.example.newsapp.api.retrofitHelper
+import com.example.newsapp.R
 import com.example.newsapp.databinding.FragmentHomeBinding
-import com.example.newsapp.model.news
 import com.example.newsapp.viewmodels.newsViewModel
+import com.example.newsapp.viewmodels.newsViewModelFactory
 import myCustomAdapter
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 class HomeFragment : Fragment() {
 
@@ -33,14 +27,13 @@ class HomeFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        var muadabter=myCustomAdapter(this.context!!)
-        var viewModel: newsViewModel = ViewModelProvider(this).get(newsViewModel::class.java)
-        val homeViewModel =
-            ViewModelProvider(this).get(HomeViewModel::class.java)
+        var myAdapter=myCustomAdapter(this.context!!)
+        val viewModelfactory=newsViewModelFactory(this.context!!)
+        var viewModel: newsViewModel = ViewModelProvider(this,viewModelfactory).get(newsViewModel::class.java)
+
 
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         val root: View = binding.root
-
 viewModel.getNews()
         viewModel.newsData.observe(this) {
             if(it.isLoading)
@@ -50,10 +43,18 @@ viewModel.getNews()
             else
             {
                 binding.progressBar.visibility=View.GONE
-                muadabter.differ.submitList(it.data.body()?.articles)
-                binding.recyclerView.adapter=muadabter
-                //without layout manager recycle view will not wor
+                myAdapter.differ.submitList(it.data.body()?.articles)
+                binding.recyclerView.adapter=myAdapter
+                //without layout manager recycle view will not worK
                 binding.recyclerView.layoutManager=LinearLayoutManager(activity)
+                myAdapter.setOnItemClickListener { article ->
+                    println("clicked..............")
+                    println(article.toString())
+                    var bundle = Bundle()
+                    bundle.putSerializable("article",article)
+                    findNavController().navigate(R.id.action_navigation_home_to_webArticleFragment,bundle)
+                }
+
             }
 
         }
